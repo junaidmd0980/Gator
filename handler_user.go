@@ -13,7 +13,7 @@ import (
 
 func handlerLogin(s *state, cmd command) error {
 	if len(cmd.Args) == 0 {
-		return fmt.Errorf("you must provide username")
+		return fmt.Errorf("Usage: cli <command> <args>")
 	}
 
 	name := cmd.Args[0]
@@ -37,7 +37,7 @@ func handlerLogin(s *state, cmd command) error {
 
 func handlerRegister(s *state, cmd command) error {
 	if len(cmd.Args) == 0 {
-		return fmt.Errorf("you must provide username")
+		return fmt.Errorf("Usage: cli <command> <args>")
 	}
 
 	name := cmd.Args[0]
@@ -62,18 +62,8 @@ func handlerRegister(s *state, cmd command) error {
 	return nil
 }
 
-func handlerReset(s *state, cmd command) error {
-	err := s.db.DeleteUsers(context.Background())
-	if err != nil {
-		return fmt.Errorf("failed to reset users data: %w", err)
-	}
-
-	fmt.Println("Data reset successfully!")
-	return nil
-}
-
 func handlerUsers(s *state, cmd command) error {
-	users, err := s.db.GetUsers(context.Background())
+	users, err := s.db.ListUsers(context.Background())
 	if err != nil {
 		return fmt.Errorf("failed to fetch users data: %w", err)
 	}
