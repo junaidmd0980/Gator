@@ -2,8 +2,13 @@ package main
 
 import (
 	"config"
+	"database/sql"
 	"fmt"
+	"log"
 	"os"
+
+	"github.com/junaidmd0980/gator/internal/database"
+	_ "github.com/lib/pq"
 )
 
 func main() {
@@ -13,15 +18,27 @@ func main() {
 		os.Exit(1)
 	}
 
+	db, err := sql.Open("postgres", cfg.DbUrl)
+	if err != nil {
+		log.Fatalf("Error connecting to database: %v", err)
+	}
+	defer db.Close()
+
+	dbQueries := database.New(db)
+
 	s := state{
-		configPtr: &cfg,
+		db:     dbQueries,
+		cfgPtr: &cfg,
 	}
 
 	cmds := commands{
-		CommandName: make(map[string]func(*state, command) error),
+		RegCmds: make(map[string]func(*state, command) error),
 	}
 
 	cmds.register("login", handlerLogin)
+	cmds.register("register", handlerRegister)
+	cmds.register("reset", handlerReset)
+	cmds.register("users", handlerUsers)
 
 	if len(os.Args) < 2 {
 		fmt.Println("Error: not enough args provided")
