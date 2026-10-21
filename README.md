@@ -1,28 +1,45 @@
+<div align="center">
+
 # 🐊 Gator
 
-Gator is a command-line RSS feed aggregator written in Go. It lets multiple users register, add RSS feeds, follow or unfollow feeds, and continuously fetch new posts from those feeds into a PostgreSQL database.
+**A command-line RSS feed aggregator built with Go and PostgreSQL.**
+
+[![Go](https://img.shields.io/badge/Go-1.22%2B-00ADD8?logo=go&logoColor=white)](https://go.dev/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15%2B-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+
+Gator lets multiple users register, add RSS feeds, follow or unfollow feeds, and continuously fetch new posts into a PostgreSQL database.
 
 Built while working through the [boot.dev](https://boot.dev/) Go course.
 
-## Contents
+</div>
 
-- [Requirements](#requirements)
-- [Setup](#setup)
-- [Usage](#usage)
-- [Commands](#commands)
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [Development](#development)
-- [Notes & Warnings](#notes--warnings)
+---
 
-## Requirements
+## 📑 Contents
 
-- **Go 1.22+** — to install and build the CLI
-- **PostgreSQL 15+** — stores users, feeds, follows, and posts
-- **[goose](https://github.com/pressly/goose)** — runs database migrations
-- **[sqlc](https://sqlc.dev/)** — only needed if you modify SQL queries
+- [Requirements](#-requirements)
+- [Quick Start](#-quick-start)
+- [Usage](#-usage)
+- [Commands](#-commands)
+- [Tech Stack](#-tech-stack)
+- [Project Structure](#-project-structure)
+- [Development](#-development)
+- [Notes & Warnings](#%EF%B8%8F-notes--warnings)
 
-## Setup
+---
+
+## 📦 Requirements
+
+| Tool | Version | Purpose |
+|---|---:|---|
+| [Go](https://go.dev/) | `1.22+` | Install and build the CLI |
+| [PostgreSQL](https://www.postgresql.org/) | `15+` | Stores users, feeds, follows, and posts |
+| [goose](https://github.com/pressly/goose) | Latest | Runs database migrations |
+| [sqlc](https://sqlc.dev/) | Latest | Regenerates database code after SQL changes |
+
+---
+
+## 🚀 Quick Start
 
 ### 1. Install Gator
 
@@ -30,13 +47,13 @@ Built while working through the [boot.dev](https://boot.dev/) Go course.
 go install github.com/junaidmd0980/Gator@latest
 ```
 
-If `gator` is not found, add Go’s binary directory to your `PATH`:
+If the `gator` command is not found, add Go’s binary directory to your `PATH`:
 
 ```bash
 export PATH="$PATH:$(go env GOPATH)/bin"
 ```
 
-Add that line to `~/.bashrc` or `~/.zshrc` to make it permanent.
+To make this permanent, add the line above to `~/.bashrc` or `~/.zshrc`.
 
 ### 2. Create the database
 
@@ -52,12 +69,13 @@ CREATE DATABASE gator;
 
 ### 3. Apply migrations
 
-Clone the repository and run the goose migrations:
-
 ```bash
 git clone [https://github.com/junaidmd0980/Gator.git](https://github.com/junaidmd0980/Gator.git)
 cd Gator
-goose -dir sql/schema postgres "postgres://postgres:postgres@localhost:5432/gator?sslmode=disable" up
+
+goose -dir sql/schema postgres \
+  "postgres://postgres:postgres@localhost:5432/gator?sslmode=disable" \
+  up
 ```
 
 ### 4. Create the config file
@@ -71,9 +89,12 @@ Create `~/.gatorconfig.json`:
 }
 ```
 
-Leave `current_user_name` empty. Gator updates it automatically when you register or log in.
+> [!NOTE]  
+> Leave `current_user_name` empty. Gator updates it automatically when you register or log in.
 
-## Usage
+---
+
+## 🧭 Usage
 
 Create a user and add a feed:
 
@@ -94,7 +115,9 @@ In another terminal, read the latest posts:
 gator browse 5
 ```
 
-## Commands
+---
+
+## ⌨️ Commands
 
 | Command | Arguments | Description |
 |---|---|---|
@@ -108,9 +131,9 @@ gator browse 5
 | `gator following` | — | Lists feeds followed by the current user |
 | `gator unfollow` | `<url>` | Unfollows a feed; requires a logged-in user |
 | `gator agg` | `<time_between_reqs>` | Fetches feeds on a loop, waiting the given duration between requests |
-| `gator browse` | `[limit]` | Prints the latest posts from feeds you follow; defaults to 2 |
+| `gator browse` | `[limit]` | Prints the latest posts from followed feeds; defaults to `2` |
 
-Example:
+### Example
 
 ```bash
 gator register alice
@@ -121,7 +144,9 @@ gator agg 1m
 gator browse 10
 ```
 
-## Tech Stack
+---
+
+## 🛠 Tech Stack
 
 - [Go](https://go.dev/) — CLI, HTTP requests, and XML parsing
 - [PostgreSQL](https://www.postgresql.org/) — data storage
@@ -130,7 +155,9 @@ gator browse 10
 - [lib/pq](https://github.com/lib/pq) — PostgreSQL driver
 - [google/uuid](https://github.com/google/uuid) — primary key generation
 
-## Project Structure
+---
+
+## 🗂 Project Structure
 
 ```text
 Gator/
@@ -144,19 +171,21 @@ Gator/
 ├── handler_browse.go     # browse
 ├── handler_reset.go      # reset
 ├── rss_feed.go           # RSS fetching and parsing
-├── scrapeFeeds.go        # helper function for agg
+├── scrapeFeeds.go        # Helper function for agg
 ├── sqlc.yaml             # sqlc configuration
 ├── sql/
-│   ├── schema/           # goose migrations
+│   ├── schema/           # Goose migrations
 │   └── queries/          # sqlc query source
 └── internal/
     ├── config/           # Reads and writes ~/.gatorconfig.json
     └── database/         # sqlc-generated database code
 ```
 
-## Development
+---
 
-Run Gator directly from a clone:
+## 👨‍💻 Development
+
+Run Gator directly from a local clone:
 
 ```bash
 git clone [https://github.com/junaidmd0980/Gator.git](https://github.com/junaidmd0980/Gator.git)
@@ -177,7 +206,7 @@ After changing files in `sql/queries/` or `sql/schema/`, regenerate the database
 sqlc generate
 ```
 
-New migration files should go in `sql/schema/` using the `NNN_name.sql` naming convention and standard goose markers:
+New migration files should go in `sql/schema/` using the `NNN_name.sql` naming convention and standard Goose markers:
 
 ```sql
 -- +goose Up
@@ -185,10 +214,24 @@ New migration files should go in `sql/schema/` using the `NNN_name.sql` naming c
 -- +goose Down
 ```
 
-## Notes & Warnings
+---
 
-- `gator reset` deletes all users, feeds, follows, and posts. There is no confirmation prompt and no undo.
-- `gator agg` is a long-running process. It fetches the least recently updated feed on each tick.
+## ⚠️ Notes & Warnings
+
+> [!WARNING]  
+> `gator reset` deletes all users, feeds, follows, and posts. There is no confirmation prompt and no undo.
+
+> [!IMPORTANT]  
+> `gator agg` is a long-running process. It fetches the least recently updated feed on each tick.
+
 - Use reasonable intervals such as `1m` or `1h`. Requesting feeds too frequently can get your IP blocked by feed servers.
 - `gator login` only changes the username stored in your local config file; it does not provide real authentication.
 - Your database connection string is stored in plaintext in `~/.gatorconfig.json`. Do not use production credentials locally.
+
+---
+
+<div align="center">
+
+**Built with Go, PostgreSQL, sqlc, and goose.**
+
+</div>
