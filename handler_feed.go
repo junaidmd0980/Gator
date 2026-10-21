@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"time"
 
@@ -10,25 +9,26 @@ import (
 	"github.com/junaidmd0980/gator/internal/database"
 )
 
-func handlerAddFeed(s *state, cmd command) error {
+func handlerAddFeed(s *state, cmd command, user database.User) error {
 	if len(cmd.Args) == 0 {
 		return fmt.Errorf("Usage: cli <command> <args>")
 	}
 
 	name := cmd.Args[0]
 	url := cmd.Args[1]
+	ctx := context.Background()
 
-	currentUsername := s.cfgPtr.CurrentUserName
+	// 	currentUsername := s.cfgPtr.CurrentUserName
+	//
+	// 	user, err := s.db.GetUser(ctx, currentUsername)
+	// 	if err != nil {
+	// 		if err == sql.ErrNoRows {
+	// 			return fmt.Errorf("user must be logged in: %w", err)
+	// 		}
+	// 		return fmt.Errorf("failed to fetch user: %w", err)
+	// 	}
 
-	user, err := s.db.GetUser(context.Background(), currentUsername)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return fmt.Errorf("user must be logged in: %w", err)
-		}
-		return fmt.Errorf("database error: %w", err)
-	}
-
-	feed, err := s.db.CreateFeed(context.Background(), database.CreateFeedParams{
+	feed, err := s.db.CreateFeed(ctx, database.CreateFeedParams{
 		ID:        uuid.New(),
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
@@ -38,6 +38,17 @@ func handlerAddFeed(s *state, cmd command) error {
 	})
 	if err != nil {
 		return fmt.Errorf("failed to create feed: %w", err)
+	}
+
+	_, err = s.db.CreateFeedFollow(ctx, database.CreateFeedFollowParams{
+		ID:        uuid.New(),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		UserID:    user.ID,
+		FeedID:    feed.ID,
+	})
+	if err != nil {
+		return fmt.Errorf("failed to follow the feed: %w", err)
 	}
 
 	fmt.Printf("Feed created successfully:\n%+v\n", feed)

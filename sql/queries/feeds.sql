@@ -10,6 +10,10 @@ VALUES (
 )
 RETURNING *;
 
+-- name: GetFeedByURL :one
+SELECT * FROM feeds
+WHERE url = $1 LIMIT 1;
+
 -- name: ListFeeds :many
 SELECT
     feeds.name,

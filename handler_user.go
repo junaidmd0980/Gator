@@ -21,10 +21,10 @@ func handlerLogin(s *state, cmd command) error {
 	_, err := s.db.GetUser(context.Background(), name)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			fmt.Printf("Error: user '%s' does not exist in the database\n", name)
+			fmt.Printf("Error: user '%s' is not registered\n", name)
 			os.Exit(1)
 		}
-		return fmt.Errorf("database error: %w", err)
+		return fmt.Errorf("failed to fetch user: %w", err)
 	}
 
 	err = s.cfgPtr.SetUser(name)
