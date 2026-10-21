@@ -192,7 +192,3 @@ New migration files should go in `sql/schema/` using the `NNN_name.sql` naming c
 - Use reasonable intervals such as `1m` or `1h`. Requesting feeds too frequently can get your IP blocked by feed servers.
 - `gator login` only changes the username stored in your local config file; it does not provide real authentication.
 - Your database connection string is stored in plaintext in `~/.gatorconfig.json`. Do not use production credentials locally.
-
-## License
-
-This project was built as a learning project. Feel free to fork and adapt it.
